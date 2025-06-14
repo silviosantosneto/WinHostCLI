@@ -7,36 +7,25 @@ setopt shwordsplit
 
 # Constants
 [[ -z "$HOSTS_FILE" ]] && readonly HOSTS_FILE="/mnt/c/Windows/System32/drivers/etc/hosts"
-[[ -z "$CLEAN_HOST_FILE" ]] && readonly CLEAN_HOST_FILE=$(create_temp_file)
 [[ -z "$MARKER_START" ]] && readonly MARKER_START="# Valet generated Hosts. Do not change"
 [[ -z "$MARKER_END" ]] && readonly MARKER_END="# End Valet generated Hosts"
 
-create_temp_file() {
-  local temp_file
-  temp_file=$(mktemp) || {
-    echo "❌ Failed to create temp file." >&2
-    return 1
-  }
-  trap 'rm -f "$temp_file"' EXIT
-  echo "$temp_file"
-}
-
 copy_and_clean_host_file() {
-  local input="$1"
-  local output="$2"
+  local input="$1" output="$2"
 
   awk '
     /^[[:space:]]*$/ { empty_line_count++ ; next }
     { lines[NR] = $0; last = NR; empty_line_count = 0 }
     END {
       for (i = 1; i <= last; i++) print lines[i]
+      print ""
     }
-  ' "$input" > "$output"
+  ' "$input" >"$output"
 }
 # Flushes Windows DNS cache
 flushdnswin() {
   if ! powershell.exe -Command "ipconfig /flushdns" >/dev/null 2>&1; then
-    echo "❌ Failed to flush DNS cache. Try running WSL as administrator." >&2
+    echo "❌ Failed to flush DNS cache. Try running as administrator." >&2
     return 1
   fi
 }
@@ -61,80 +50,77 @@ function is_valid_ip() {
 
 # Validate domain
 function is_valid_domain() {
-  local domain="$1"
-  if [[ "$domain" == *.* && "$domain" =~ ^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$ ]]; then
+  if [[ $1 == *.* && $1 =~ ^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$ ]]; then
     return 0
   else
+    echo "❌Invalid domain: $1"
     return 1
   fi
 }
 
 # Insert domain
-insert_host_between_markers() {
-  local ip="$1" domain="$2" infile="$3" outfile="$4"
-  local in_section=0 inserted=0 found=0
+insert_host() {
+  local host_line="$1" infile="$2" outfile="$3"
+  local in_section=false host_added=false line count
 
   while IFS= read -r line || [[ -n "$line" ]]; do
+    count=$((count + 1))
     if [[ "$line" == "$MARKER_START" ]]; then
-      echo "$line" >>"$outfile"
-      in_section=1
-      found=1
-      continue
-    elif [[ "$line" == "$MARKER_END" ]]; then
-      ((inserted == 0)) && echo "$ip    $domain" >>"$outfile"
-      echo "$line" >>"$outfile"
-      in_section=0
+      printf '%s\n' "$line" >> "$outfile" &&  in_section=true
+      printf '%s\n' "$host_line" >> "$outfile" && host_added=true
       continue
     fi
-    [[ $in_section -eq 1 && "$line" =~ [[:space:]]$domain$ ]] && continue
-    echo "$line" >>"$outfile"
-  done <"$infile"
 
-  if ((found == 0)); then
-    {
-      echo ""
-      echo "$MARKER_START"
-      echo "$ip    $domain"
-      echo "$MARKER_END"
-    } >>"$outfile"
+    if [[ "$in_section" == true ]]; then
+      if [[ "$line" == "$MARKER_END" ]]; then
+        in_section=false
+      elif [[ "$host_added" == true && "$line" =~ ^[[:space:]]*$ ]]; then
+        printf '%s\n' "$MARKER_END" >>"$outfile"
+        echo "$count"
+        in_section=false
+        continue
+      elif [[ "$line" == "$host_line" ]]; then
+        continue
+      fi
+    fi
+
+    printf '%s\n' "$line" >> "$outfile"
+  done < "$infile"
+
+  if [[ "$host_added" == false && "$in_section" == false ]]; then
+    printf '%s\n%s\n%s\n' "$MARKER_START" "$host_line" "$MARKER_END" >> "$outfile"
   fi
 }
 
 # Add entry(ies) to hosts file
 addhostwin() {
 
-  local ip="127.0.0.1"
+  local ip="127.0.0.1" domain temp_file
+
   if is_valid_ip "$1"; then
     ip="$1"
     shift
   fi
 
-  local domain temp_file
-  temp_file=$(mktemp) || {
-    echo "❌ Failed to create temp file." >&2
-    return 1
-  }
-  trap 'rm -f "$temp_file"' EXIT
+  local clear_host_file=$(mktemp)
+  local new_host_file=$(mktemp)
+  trap 'rm -f "$clear_host_file"' EXIT
+  trap 'rm -f "$new_host_file"' EXIT
+
+  copy_and_clean_host_file "$HOSTS_FILE" "$clear_host_file"
 
   for domain in "$@"; do
-    is_valid_domain "$domain" || {
-      echo "❌Invalid domain: $domain" >&2
-      continue
-    }
 
-    copy_and_clean_host_file "$HOSTS_FILE" "$CLEAN_HOST_FILE" || {
-      echo "❌ Failed to copy and clean hosts file." >&2
-      continue
-    }
+    is_valid_domain $domain
 
-    if ! insert_host_between_markers "$ip" "$domain" "$CLEAN_HOST_FILE" "$temp_file"; then
+    if ! insert_host "$ip\t\t$domain" "$clear_host_file" "$new_host_file"; then
       echo "❌ Failed to process domain" >&2
-      continue
+      return 1
     fi
 
-    if ! sudo cp "$temp_file" "$HOSTS_FILE"; then
+    if ! sudo cp "$new_host_file" "$HOSTS_FILE"; then
       echo "❌ Permission denied updating hosts." >&2
-      continue
+      return 1
     fi
 
     flushdnswin
