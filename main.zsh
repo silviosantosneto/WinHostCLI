@@ -3,8 +3,6 @@
 # Manage Windows 'hosts' file entries directly from WSL
 # ================================================================================================
 
-setopt shwordsplit
-
 [[ -z "$HOSTS_FILE" ]] && readonly HOSTS_FILE="/mnt/c/Windows/System32/drivers/etc/hosts"
 [[ -z "$SECTION_START" ]] && readonly SECTION_START="Valet generated Hosts. Do not change"
 [[ -z "$SECTION_END" ]] && readonly SECTION_END="End Valet generated Hosts"
@@ -57,8 +55,10 @@ is_valid_domain() {
 }
 
 insert_host() {
-  local host_line="$1" infile="$2" outfile="$3"
-  local in_section=false success=false line
+  local domain="$1" ip="$2" infile="$3" outfile="$4"
+  local in_section=false success=false line host_line
+
+  host_line="$(printf "%s\t\t%s" "$ip" "$domain")"
 
   while IFS= read -r line || [[ -n "$line" ]]; do
     if [[ "$line" == "# $SECTION_START" ]]; then
@@ -76,6 +76,8 @@ insert_host() {
         continue
       elif [[ "$line" == "$host_line" ]]; then
         continue
+      elif [[ "$line" != \#* && "$line" =~ (^|[[:space:]])$domain($|[[:space:]#]) ]]; then
+        continue
       fi
     fi
 
@@ -88,7 +90,7 @@ insert_host() {
 }
 
 delete_host() {
-  local host_line="$1" infile="$2" outfile="$3"
+  local domain="$1" infile="$2" outfile="$3"
   local in_section=false success=false line
 
   while IFS= read -r line || [[ -n "$line" ]]; do
@@ -101,10 +103,10 @@ delete_host() {
       if [[ "$line" == "# $SECTION_END" ]]; then
         in_section=false
       elif [[ "$success" == true && "$line" =~ ^[[:space:]]*$ ]]; then
-        printf '%s\n' "# $SECTION_END" >>"$outfile"
+        printf '%s\n' "# $SECTION_END" >> "$outfile"
         in_section=false
         continue
-      elif [[ "$line" == "$host_line" ]]; then
+      elif [[ "$line" != \#* && "$line" =~ (^|[[:space:]])$domain($|[[:space:]#]) ]]; then
         success=true
         continue
       fi
@@ -134,10 +136,9 @@ delete_host() {
   fi
 
   if [[ "$success" == false && "$in_section" == false ]]; then
-    echo "❌ Host: '$host_line' not found in the section." >&2
+    echo "❌ Domain: '$domain' not found" >&2
     return 1
   fi
-
 }
 
 addhost() {
@@ -182,7 +183,7 @@ addhost() {
   done
 
   if [[ -z "$domain" ]]; then
-    echo "❌ The --domain option is required." >&2
+    echo "❌ The --domain option is required" >&2
     return 1
   fi
 
@@ -194,19 +195,19 @@ addhost() {
     return 1
   fi
 
-  insert_host "$(printf "%s\t\t%s" "$ip" "$domain")" "$clear_host_file" "$new_host_file"
+  insert_host "$domain" "$ip" "$clear_host_file" "$new_host_file"
 
   if ! sudo cp "$new_host_file" "$HOSTS_FILE"; then
-    echo "❌ Permission denied updating hosts file." >&2
+    echo "❌ Permission denied updating hosts file" >&2
     return 1
   fi
 
   flushdnswin
 
   if [[ "$ip" == "127.0.0.1" ]]; then
-    echo "✔️ Domain '$domain' added successfully pointing to localhost."
+    echo "✔️ Domain '$domain' added"
   else
-    echo "✔️ Domain '$domain' added successfully pointing to $ip."
+    echo "✔️ Domain '$domain' pointing to $ip added"
   fi
 }
 
@@ -220,14 +221,6 @@ removehost() {
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --ip|-i)
-        shift
-        [[ -z "$1" ]] && {
-          echo "❌ Missing IP address after --ip" >&2
-          return 1
-        }
-        ip="$1"
-        ;;
       --domain|-d)
         shift
         [[ -z "$1" ]] && {
@@ -252,11 +245,7 @@ removehost() {
   done
 
   if [[ -z "$domain" ]]; then
-    echo "❌ The --domain option is required." >&2
-    return 1
-  fi
-
-  if ! is_valid_ip "$ip"; then
+    echo "❌ The --domain option is required" >&2
     return 1
   fi
 
@@ -264,7 +253,7 @@ removehost() {
     return 1
   fi
 
-  if ! delete_host "$(printf "%s\t\t%s" "$ip" "$domain")" "$clear_host_file" "$new_host_file"; then
+  if ! delete_host "$domain" "$clear_host_file" "$new_host_file"; then
     return 1
   fi
 
