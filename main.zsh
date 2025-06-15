@@ -31,25 +31,26 @@ flushdnswin() {
 }
 
 # Validate IPv4
-function is_valid_ip() {
+is_valid_ip() {
   local ip="$1"
   IFS='.' read -r o1 o2 o3 o4 extra <<<"$ip"
 
   if [[ -n "$extra" || -z "$o1" || -z "$o2" || -z "$o3" || -z "$o4" ]]; then
+    echo "❌ Invalid IP: '$1'"
     return 1
   fi
 
   for octet in "$o1" "$o2" "$o3" "$o4"; do
-    if ! [[ "$octet" =~ ^[0-9]+$ ]] || ((octet < 1 || octet > 254)); then
+    if ! [[ "$octet" =~ ^[0-9]+$ ]] || ((octet < 0 || octet > 254)); then
+      echo "❌ Invalid IP: '$1'"
       return 1
     fi
   done
-
   return 0
 }
 
 # Validate domain
-function is_valid_domain() {
+is_valid_domain() {
   if [[ $1 == *.* && $1 =~ ^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$ ]]; then
     return 0
   else
@@ -94,44 +95,79 @@ insert_host() {
 
 # Add entry(ies) to hosts file
 addhostwin() {
-
-  local ip="127.0.0.1" domain temp_file
-
-  if is_valid_ip "$1"; then
-    ip="$1"
-    shift
-  fi
-
-  local clear_host_file=$(mktemp)
-  local new_host_file=$(mktemp)
-  trap 'rm -f "$clear_host_file"' EXIT
-  trap 'rm -f "$new_host_file"' EXIT
+  local ip="127.0.0.1" domain=""
+  local clear_host_file=$(mktemp) || { echo "❌ Erro clear_host_file"; return 1; }
+  local new_host_file=$(mktemp) || { echo "❌ Erro new_host_file"; return 1; }
+  trap 'rm -f "$clear_host_file" "$new_host_file"' EXIT
 
   copy_and_clean_host_file "$HOSTS_FILE" "$clear_host_file"
 
-  for domain in "$@"; do
-
-    is_valid_domain $domain
-
-    if ! insert_host "$ip\t\t$domain" "$clear_host_file" "$new_host_file"; then
-      echo "❌ Failed to process domain" >&2
-      return 1
-    fi
-
-    if ! sudo cp "$new_host_file" "$HOSTS_FILE"; then
-      echo "❌ Permission denied updating hosts." >&2
-      return 1
-    fi
-
-    flushdnswin
-
-    if [[ $ip == "127.0.0.1" ]]; then
-      echo "✔️ Domain $domain successfully added."
-    else
-      echo "✔️ Domain $domain pointing to $ip successfully added."
-    fi
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --ip|-i)
+        shift
+        [[ -z "$1" ]] && {
+          echo "❌ Missing IP address after --ip" >&2
+          return 1
+        }
+        ip="$1"
+        ;;
+      --domain|-d)
+        shift
+        [[ -z "$1" ]] && {
+          echo "❌ Missing domain after --domain" >&2
+          return 1
+        }
+        domain="$1"
+        ;;
+      --help|-h)
+        echo "Usage: addhostwin [--ip <ip>] --domain <domain>"
+        echo "Example: addhostwin --ip 192.168.0.1 --domain test.local"
+        echo "         addhostwin --domain test.local"
+        return 0
+        ;;
+      *)
+        echo "❌ Unknown option: $1" >&2
+        echo "Use --help for usage." >&2
+        return 1
+        ;;
+    esac
+    shift
   done
+
+  if [[ -z "$domain" ]]; then
+    echo "❌ The --domain option is required." >&2
+    return 1
+  fi
+
+  if ! is_valid_ip "$ip"; then
+    return 1
+  fi
+
+  if ! is_valid_domain "$domain"; then
+    return 1
+  fi
+
+  # Insere no hosts
+  if ! insert_host "$(printf "%s\t\t%s" "$ip" "$domain")" "$clear_host_file" "$new_host_file"; then
+    echo "❌ Failed to process domain: $domain" >&2
+    return 1
+  fi
+
+  if ! sudo cp "$new_host_file" "$HOSTS_FILE"; then
+    echo "❌ Permission denied updating hosts file." >&2
+    return 1
+  fi
+
+  flushdnswin
+
+  if [[ "$ip" == "127.0.0.1" ]]; then
+    echo "✔️ Domain '$domain' added successfully pointing to localhost."
+  else
+    echo "✔️ Domain '$domain' added successfully pointing to $ip."
+  fi
 }
+
 
 # Remove domain and markers if empty
 removehostwin() {
