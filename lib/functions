@@ -1,12 +1,3 @@
-# ================================================================================================
-# Windows Hosts Manager via WSL
-# Manage Windows 'hosts' file entries directly from WSL
-# ================================================================================================
-
-[[ -z "$HOSTS_FILE" ]] && readonly HOSTS_FILE="/mnt/c/Windows/System32/drivers/etc/hosts"
-[[ -z "$SECTION_START" ]] && readonly SECTION_START="Valet generated Hosts. Do not change"
-[[ -z "$SECTION_END" ]] && readonly SECTION_END="End Valet generated Hosts"
-
 copy_and_clean_host_file() {
   local input="$1" output="$2"
 
@@ -141,6 +132,7 @@ delete_host() {
   fi
 }
 
+
 addhost() {
   local ip="127.0.0.1" domain=""
   local clear_host_file=$(mktemp) || { echo "❌ Erro clear_host_file"; return 1; }
@@ -210,6 +202,7 @@ addhost() {
     echo "✔️ Domain '$domain' pointing to $ip added"
   fi
 }
+
 
 removehost() {
   local ip="127.0.0.1" domain=""

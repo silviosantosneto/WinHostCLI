@@ -1,0 +1,33 @@
+#!/bin/bash
+# ================================================================================================
+# hostwin - Windows Hosts Manager via WSL
+# ================================================================================================
+
+source "$HOME/.zsh/winhostctl/.env"
+source "$HOME/.zsh/winhostctl/lib/functions"
+
+action="$1"
+shift
+
+case "$action" in
+  --add)
+    domain="$1"
+    shift
+    ip="${1:-127.0.0.1}"
+    addhost --domain "$domain" --ip "$ip"
+    ;;
+  --remove)
+    domain="$1"
+    removehost --domain "$domain"
+    ;;
+  --help|-h)
+    echo "Usage:"
+    echo "  hostwin --add <domain> [ip]"
+    echo "  hostwin --remove <domain>"
+    ;;
+  *)
+    echo "❌ Unknown action: $action"
+    echo "Use --help for usage." >&2
+    exit 1
+    ;;
+esac
