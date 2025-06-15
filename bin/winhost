@@ -1,10 +1,13 @@
 #!/bin/bash
 # ================================================================================================
-# hostwin - Windows Hosts Manager via WSL
+# winhost - Windows Hosts Manager via WSL
 # ================================================================================================
 
-source "$HOME/.zsh/winhostctl/.env"
-source "$HOME/.zsh/winhostctl/lib/functions"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WINHOSTCTL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+source "$WINHOSTCTL_DIR/.env"
+source "$WINHOSTCTL_DIR/lib/functions"
 
 action="$1"
 shift
@@ -13,7 +16,7 @@ case "$action" in
   --add)
     domain="$1"
     shift
-    ip="${1:-127.0.0.1}"
+    ip="${1:-$DEFAULT_IP_ADDRESS}"
     addhost --domain "$domain" --ip "$ip"
     ;;
   --remove)
