@@ -3,8 +3,8 @@
 # hostwin - Windows Hosts Manager via WSL
 # ================================================================================================
 
-source "$HOME/.zsh/winhostctl/lib/env.sh"
-source "$HOME/.zsh/winhostctl/lib/functions.sh"
+source "$HOME/.zsh/winhostctl/.env"
+source "$HOME/.zsh/winhostctl/lib/functions"
 
 action="$1"
 shift
