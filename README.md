@@ -3,13 +3,13 @@
 </p>
 <p align="center">
   <a href="https://github.com/silviosantosneto/winhostctl/releases">
-    <img src="https://img.shields.io/github/v/release/silviosantosneto/winhostctl?style=for-the-badge" alt="Version">
+    <img src="https://img.shields.io/github/v/release/silviosantosneto/winhostctl" alt="Version">
   </a>
-  <a href="https://github.com/silviosantosneto/winhostctl/blob/develop/LICENSE">
-    <img src="https://img.shields.io/github/license/silviosantosneto/winhostctl?style=for-the-badge" alt="License">
+  <a href="https://github.com/silviosantosneto/winhostctl/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/silviosantosneto/winhostctl" alt="License">
   </a>
   <a href="https://www.gnu.org/software/bash/">
-    <img src="https://img.shields.io/badge/Shell-bash-informational?style=for-the-badge&logo=gnu-bash" alt="Shell">
+    <img src="https://img.shields.io/badge/Shell-bash-informational" alt="Shell">
   </a>
 </p>
 
@@ -109,5 +109,3 @@ This script works from WSL and handles the `hosts` file with care. It’s tiny, 
 (But seriously, it should be fine. I use this every day.)
 
 Thanks for reading — hope it helps! 🙌
-
-— Silvio Santos Neto
