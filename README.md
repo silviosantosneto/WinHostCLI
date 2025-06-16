@@ -1,8 +1,4 @@
-<p align="center">
-  <img src="https://lh3.googleusercontent.com/d/194PFOtdPXfooP2zqSSYOYaY125C6SdH6" alt="Winhostctl logo" width="600" />
-</p>
-
-
+![Logo](https://lh3.googleusercontent.com/d/194PFOtdPXfooP2zqSSYOYaY125C6SdH6)
 # 🪟 winhostctl
 
 [![Version](https://img.shields.io/github/v/release/silviosantosneto/winhostctl?style=for-the-badge)](https://github.com/silviosantosneto/winhostctl/releases)
