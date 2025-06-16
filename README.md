@@ -7,6 +7,7 @@
   </a>
   <a href="https://github.com/silviosantosneto/winhostctl/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/silviosantosneto/winhostctl" alt="License">
+
   </a>
   <a href="https://www.gnu.org/software/bash/">
     <img src="https://img.shields.io/badge/Shell-bash-informational" alt="Shell">
