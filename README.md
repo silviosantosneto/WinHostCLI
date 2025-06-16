@@ -1,9 +1,19 @@
-![Logo](https://lh3.googleusercontent.com/d/194PFOtdPXfooP2zqSSYOYaY125C6SdH6)
-# 🪟 winhostctl
+<p align="center">
+  <img src="https://drive.google.com/uc?export=view&id=194PFOtdPXfooP2zqSSYOYaY125C6SdH6" alt="Logo" width="400"/>
+</p>
 
-[![Version](https://img.shields.io/github/v/release/silviosantosneto/winhostctl?style=for-the-badge)](https://github.com/silviosantosneto/winhostctl/releases)
-[![License](https://img.shields.io/github/license/silviosantosneto/winhostctl?style=for-the-badge)](LICENSE)
-[![Shell](https://img.shields.io/badge/Shell-bash-informational?style=for-the-badge&logo=gnu-bash)](https://www.gnu.org/software/bash/)
+<p align="center">
+  <a href="https://github.com/silviosantosneto/winhostctl/releases">
+    <img src="https://img.shields.io/github/v/release/silviosantosneto/winhostctl?style=for-the-badge" alt="Version">
+  </a>
+  <a href="https://github.com/silviosantosneto/winhostctl/blob/develop/LICENSE">
+    <img src="https://img.shields.io/github/license/silviosantosneto/winhostctl?style=for-the-badge" alt="License">
+  </a>
+  <a href="https://www.gnu.org/software/bash/">
+    <img src="https://img.shields.io/badge/Shell-bash-informational?style=for-the-badge&logo=gnu-bash" alt="Shell">
+  </a>
+</p>
+
 
 Hi! 👋  
 This is `winhostctl`, a little tool I built out of sheer frustration with manually editing the Windows `hosts` file from WSL. If you've been there, you know the pain.
