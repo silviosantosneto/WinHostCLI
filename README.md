@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://drive.google.com/uc?export=view&id=12VmrI29SkF-prve4u7eOg2nJSOL5r4eS" alt="Logo" width="200"/>
+  <img src="https://lh3.googleusercontent.com/d//1NT9rOH2gatgjWsCT4wFsdCIbuwdzNlXt" alt="Logo" width="300"/>
 </p>
 <p align="center">
   <a href="https://github.com/silviosantosneto/winhostctl/releases">
@@ -59,10 +59,13 @@ source ~/.bashrc    # or .zshrc
 winhostctl --help
 
 # Add a domain
-winhostctl add example.local
+winhostctl add mysite.test
+
+# Add a domain with a custom IP
+winhostctl add mysite.test 192.168.0.1
 
 # Remove it later
-winhostctl remove example.local
+winhostctl remove mysite.test
 ```
 
 ## 💡 Example
