@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://ibb.co/XkNkqYSr" alt="winhostctl header" width="600" />
+  <img src="https://lh3.googleusercontent.com/d/194PFOtdPXfooP2zqSSYOYaY125C6SdH6" alt="Winhostctl logo" width="600" />
 </p>
 
 
