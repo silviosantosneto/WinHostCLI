@@ -15,9 +15,10 @@
 
 
 Hi! 👋  
-This is `winhostctl`, a little tool I built out of sheer frustration with manually editing the Windows `hosts` file from WSL. If you've been there, you know the pain.
+I built winhostctl because I really don’t like using localhost as a domain when working with Valet on WSL. I wanted to use custom domains like myproject.test, but doing that on Ubuntu inside WSL meant editing the Windows hosts file manually — and that gets old fast.
 
-At some point, I got tired of opening `nano /mnt/c/Windows/System32/drivers/etc/hosts` every time I wanted to test a local domain. I wanted a simple CLI that *just worked*, respected the file, and didn’t mess with unrelated lines. So… I made one.
+So, I wrote a script that handles it for me. Clean, safe, and zero hassle.If you're also tired of jumping through hoops just to map a local domain, this tool might save you a few headaches.
+
 
 ## 🚀 Version 1.0.0
 
@@ -39,7 +40,7 @@ You end up with a section like this:
 
 ```
 # =========== Start winhostctl generated Hosts. Do not change. ============
-127.0.0.1           myproject.test
+127.0.0.1               myproject.test
 # ================== End winhostctl end generated Hosts. ==================
 ```
 
@@ -48,37 +49,48 @@ You end up with a section like this:
 ```bash
 git clone https://github.com/silviosantosneto/winhostctl.git
 chmod +x winhostctl/bin/winhost
-echo 'export PATH="$PATH:/path/to/winhostctl/bin"' >> ~/.bashrc   # or .zshrc
-source ~/.bashrc    # or .zshrc
+echo 'export PATH="$PATH:/path/to/winhostctl/bin"' >> ~/.bashrc # or .zshrc
+source ~/.bashrc # or .zshrc
 ```
 
 ## ⚙️ How I use it
 
 ```bash
+# --------------------------- Help ----------------------------
 # See the built-in help
-winhostctl --help
+winhost -h
+# See the long help
+winhost --help
 
+# ------------------------ Add a domain ------------------------
 # Add a domain
-winhostctl add mysite.test
+winhost -a myproject.test
+# Using the long form
+winhost --add myproject.test
 
-# Add a domain with a custom IP
-winhostctl add mysite.test 192.168.0.1
+# --------------- Add a domain with a custom IP ----------------
+winhost -a myproject.test 192.168.0.1
+# Using the long form
+winhost --add myproject.test 192.168.0.1
 
-# Remove it later
-winhostctl remove mysite.test
+# ----------------------- Remove a domain -----------------------
+# Remove a domain
+winhost -r myproject.test
+# Using the long form
+winhost --remove myproject.test
 ```
 
 ## 💡 Example
 
 ```bash
-$ winhost mysite.test
-✔️ Domain mysite.test added
+$ winhost --add myproject.test
+✔️ Domain myproject.test added
 
-$ winhost mysite.test 192.168.0.1
-✔️ Domain mysite.test pointing to 192.168.0.1 added
+$ winhost --add myproject.test 192.168.0.1
+✔️ Domain myproject.test pointing to 192.168.0.1 added
 
-$ winhostctl remove mysite.test
-✔️ Domain mysite.test removed
+$ winhost --remove myproject.test
+✔️ Domain myproject.test removed
 ```
 
 > ⚠️ I made it so the script only touches the block it owns. Your other `hosts` entries are safe.
@@ -104,8 +116,7 @@ This script works from WSL and handles the `hosts` file with care. It’s tiny, 
 4. If it’s solid, I’ll merge it into the next version.
 
 ---
+**MIT License** – feel free to use, clone, and remix — just don’t blame me if Windows claps back with a blue screen and your fan starts screaming.
+Works fine here… so far. 🤞
 
-**MIT License** – do whatever you want, just don’t blame me if your computer catches fire.  
-(But seriously, it should be fine. I use this every day.)
-
-Thanks for reading — hope it helps! 🙌
+Thanks for stopping by — may your hosts stay clean and your terminals crash-free! 🙌

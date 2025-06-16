@@ -23,9 +23,10 @@ case "$action" in
     domain="$1"
     removehost --domain "$domain"
     ;;
-  --help|-h)
+  --help)
+    echo
     echo "Windows Hosts Manager via WSL"
-    echo "Manage your Windows 'hosts' file easily from WSL."
+    echo "Manage your Windows 'hosts' file from WSL."
     echo
     echo "Usage:"
     echo "  winhost --add <domain> [ip]     Add a domain to the Windows hosts file."
@@ -36,16 +37,28 @@ case "$action" in
     echo "Options:"
     echo "  -a, --add       Add a new host entry"
     echo "  -r, --remove    Remove an existing host entry"
-    echo "  -h, --help      Show this help message"
+    echo "  -h, --help      Show help message"
     echo
     echo "Examples:"
-    echo "  winhost --add mysite.local              # Uses default IP"
-    echo "  winhost --add mysite.local 192.168.0.1  # Uses custom IP"
-    echo "  winhost --remove mysite.local"
+    echo "  winhost --add domain.test               # Uses default IP"
+    echo "  winhost --add domain.test 192.168.0.1   # Uses custom IP"
+    echo "  winhost --remove domain.test"
+    echo
+    ;;
+  -h)
+    echo
+    echo "Usage: winhost [options] <domain> [ip]"
+    echo "Options: -a (add), -r (remove), -h (help)"
+    echo "Example: winhost -a domain.test"
+    echo "         winhost -r domain.test"
+    echo "         winhost -h"
+    echo
+    echo "For more details, use --help"
+    echo
     ;;
   *)
     echo "❌ Unknown action: $action"
-    echo "Use --help for usage." >&2
+    echo "Use -h or --help for usage." >&2
     exit 1
     ;;
 esac
