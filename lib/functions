@@ -214,5 +214,5 @@ removehost() {
 
   flushdnswin
 
-  echo "✔️ Domain '$domain' removed."
+  echo "✔️ Domain '$domain' removed"
 }
