@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://ibb.co/XkNkqYSr" alt="winhostctl header" width="600" />
-</p
+</p>
 
 
 # 🪟 winhostctl
