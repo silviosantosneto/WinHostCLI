@@ -132,52 +132,26 @@ delete_host() {
   fi
 }
 
-
 addhost() {
-  local ip="127.0.0.1" domain=""
-  local clear_host_file=$(mktemp) || { echo "❌ Erro clear_host_file"; return 1; }
-  local new_host_file=$(mktemp) || { echo "❌ Erro new_host_file"; return 1; }
+  local ip domain
+  local clear_host_file=$(mktemp) new_host_file=$(mktemp)
   trap 'rm -f "$clear_host_file" "$new_host_file"' EXIT
 
   copy_and_clean_host_file "$HOSTS_FILE" "$clear_host_file"
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --ip|-i)
-        shift
-        [[ -z "$1" ]] && {
-          echo "❌ Missing IP address after --ip" >&2
-          return 1
-        }
-        ip="$1"
-        ;;
       --domain|-d)
         shift
-        [[ -z "$1" ]] && {
-          echo "❌ Missing domain after --domain" >&2
-          return 1
-        }
         domain="$1"
         ;;
-      --help|-h)
-        echo "Usage: addhost [--ip <ip>] --domain <domain>"
-        echo "Example: addhost --ip 192.168.0.1 --domain test.local"
-        echo "         addhost --domain test.local"
-        return 0
-        ;;
-      *)
-        echo "❌ Unknown option: $1" >&2
-        echo "Use --help for usage." >&2
-        return 1
+      --ip|-i)
+        shift
+        ip="$1"
         ;;
     esac
     shift
   done
-
-  if [[ -z "$domain" ]]; then
-    echo "❌ The --domain option is required" >&2
-    return 1
-  fi
 
   if ! is_valid_ip "$ip"; then
     return 1
@@ -196,18 +170,16 @@ addhost() {
 
   flushdnswin
 
-  if [[ "$ip" == "127.0.0.1" ]]; then
+  if [[ "$ip" == "$DEFAULT_IP_ADDRESS" ]]; then
     echo "✔️ Domain '$domain' added"
   else
     echo "✔️ Domain '$domain' pointing to $ip added"
   fi
 }
 
-
 removehost() {
-  local ip="127.0.0.1" domain=""
-  local clear_host_file=$(mktemp) || { echo "❌ Erro clear_host_file"; return 1; }
-  local new_host_file=$(mktemp) || { echo "❌ Erro new_host_file"; return 1; }
+  local domain
+  local clear_host_file=$(mktemp) new_host_file=$(mktemp)
   trap 'rm -f "$clear_host_file" "$new_host_file"' EXIT
 
   copy_and_clean_host_file "$HOSTS_FILE" "$clear_host_file"
@@ -222,25 +194,9 @@ removehost() {
         }
         domain="$1"
         ;;
-      --help|-h)
-        echo "Usage: removehost [--ip <ip>] --domain <domain>"
-        echo "Example: removehost --ip 192.168.0.1 --domain test.local"
-        echo "         removehost --domain test.local"
-        return 0
-        ;;
-      *)
-        echo "❌ Unknown option: $1" >&2
-        echo "Use --help for usage." >&2
-        return 1
-        ;;
     esac
     shift
   done
-
-  if [[ -z "$domain" ]]; then
-    echo "❌ The --domain option is required" >&2
-    return 1
-  fi
 
   if ! is_valid_domain "$domain"; then
     return 1
@@ -252,15 +208,11 @@ removehost() {
 
 
   if ! sudo cp "$new_host_file" "$HOSTS_FILE"; then
-    echo "❌ Permission denied updating hosts file." >&2
+    echo "❌ Permission denied updating hosts file. Try " >&2
     return 1
   fi
 
   flushdnswin
 
-  if [[ "$ip" == "127.0.0.1" ]]; then
-    echo "✔️ Domain '$domain' removed"
-  else
-    echo "✔️ Domain '$domain' pointing to $ip removed."
-  fi
+  echo "✔️ Domain '$domain' removed"
 }

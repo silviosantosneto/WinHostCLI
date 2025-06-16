@@ -1,29 +1,47 @@
 #!/bin/bash
 # ================================================================================================
-# hostwin - Windows Hosts Manager via WSL
+# winhost - Windows Hosts Manager via WSL
 # ================================================================================================
 
-source "$HOME/.zsh/winhostctl/.env"
-source "$HOME/.zsh/winhostctl/lib/functions"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WINHOSTCTL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+source "$WINHOSTCTL_DIR/.env"
+source "$WINHOSTCTL_DIR/lib/functions"
 
 action="$1"
 shift
 
 case "$action" in
-  --add)
+  --add|-a)
     domain="$1"
     shift
-    ip="${1:-127.0.0.1}"
+    ip="${1:-$DEFAULT_IP_ADDRESS}"
     addhost --domain "$domain" --ip "$ip"
     ;;
-  --remove)
+  --remove|-r)
     domain="$1"
     removehost --domain "$domain"
     ;;
   --help|-h)
+    echo "Windows Hosts Manager via WSL"
+    echo "Manage your Windows 'hosts' file easily from WSL."
+    echo
     echo "Usage:"
-    echo "  hostwin --add <domain> [ip]"
-    echo "  hostwin --remove <domain>"
+    echo "  winhost --add <domain> [ip]     Add a domain to the Windows hosts file."
+    echo "                                  If no IP is provided, defaults to \$DEFAULT_IP_ADDRESS."
+    echo
+    echo "  winhost --remove <domain>       Remove a domain from the Windows hosts file."
+    echo
+    echo "Options:"
+    echo "  -a, --add       Add a new host entry"
+    echo "  -r, --remove    Remove an existing host entry"
+    echo "  -h, --help      Show this help message"
+    echo
+    echo "Examples:"
+    echo "  winhost --add mysite.local              # Uses default IP"
+    echo "  winhost --add mysite.local 192.168.0.1  # Uses custom IP"
+    echo "  winhost --remove mysite.local"
     ;;
   *)
     echo "❌ Unknown action: $action"
