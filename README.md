@@ -5,7 +5,7 @@
   <a href="https://github.com/silviosantosneto/winhostctl/releases">
     <img src="https://img.shields.io/github/v/release/silviosantosneto/winhostctl?style=for-the-badge" alt="Version">
   </a>
-  <a href="https://github.com/silviosantosneto/winhostctl/LICENSE">
+  <a href="https://github.com/silviosantosneto/winhostctl/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/silviosantosneto/winhostctl?style=for-the-badge" alt="License">
   </a>
   <a href="https://www.gnu.org/software/bash/">
