@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://lh3.googleusercontent.com/d//1NT9rOH2gatgjWsCT4wFsdCIbuwdzNlXt" alt="Logo" width="300"/>
+  <img src="https://lh3.googleusercontent.com/d/1LKv9ZI8SF0bHln5M_AxhJxYUYcY01PBN" alt="Logo" width="300"/>
 </p>
 <p align="center">
   <a href="https://github.com/silviosantosneto/winhostctl/releases">
