@@ -1,7 +1,6 @@
 <p align="center">
-  <img src="https://drive.google.com/uc?export=view&id=194PFOtdPXfooP2zqSSYOYaY125C6SdH6" alt="Logo" width="400"/>
+  <img src="https://drive.google.com/uc?export=view&id=12VmrI29SkF-prve4u7eOg2nJSOL5r4eS" alt="Logo" width="200"/>
 </p>
-
 <p align="center">
   <a href="https://github.com/silviosantosneto/winhostctl/releases">
     <img src="https://img.shields.io/github/v/release/silviosantosneto/winhostctl?style=for-the-badge" alt="Version">
