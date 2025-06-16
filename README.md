@@ -109,5 +109,3 @@ This script works from WSL and handles the `hosts` file with care. It’s tiny, 
 (But seriously, it should be fine. I use this every day.)
 
 Thanks for reading — hope it helps! 🙌
-
-— Silvio Santos Neto
