@@ -146,6 +146,10 @@ addhost() {
       --domain|-d)
         shift
         domain="$1"
+        [[ -z "$1" ]] && {
+          msg error MISSING_ARGUMENT >&2
+          return 1
+        }
         ;;
       --ip|-i)
         shift

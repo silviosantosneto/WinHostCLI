@@ -1,7 +1,7 @@
 {
     "error" :{
       "UNKNOWN_ACTION": "❌ Unknown action: %s\nUse -h or --help for usage.",
-      "MISSING_ARGUMENT":"❌ Missing domain after --domain",
+      "MISSING_ARGUMENT":"❌ Missing domain after --add",
       "INVALID_IP": "❌ Invalid IP Address: '%s'",
       "INVALID_DOMAIN": "❌ Invalid domain: %s",
       "DOMAIN_NOT_FOUND": "❌ Domain: '%s' not found",
