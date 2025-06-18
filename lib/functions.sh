@@ -25,13 +25,13 @@ is_valid_ip() {
   IFS='.' read -r o1 o2 o3 o4 extra <<< "$ip"
 
   if [[ -n "$extra" || -z "$o1" || -z "$o2" || -z "$o3" || -z "$o4" ]]; then
-    msg error INVALID_IP >&2
+    msg error INVALID_IP "$ip">&2
     return 1
   fi
 
   for octet in "$o1" "$o2" "$o3" "$o4"; do
     if ! [[ "$octet" =~ ^[0-9]+$ ]] || ((octet < 0 || octet > 254)); then
-      msg error INVALID_IP >&2
+      msg error INVALID_IP "$ip">&2
       return 1
     fi
   done
@@ -42,7 +42,7 @@ is_valid_domain() {
   if [[ $1 == *.* && $1 =~ ^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$ ]]; then
     return 0
   else
-    msg error INVALID_DOMAIN  >&2
+    msg error INVALID_DOMAIN "$domain" >&2
     return 1
   fi
 }
@@ -129,7 +129,7 @@ delete_host() {
   fi
 
   if [[ "$success" == false && "$in_section" == false ]]; then
-    msg error DOMAIN_NOT_FOUND >&2 "$domain"
+    msg error DOMAIN_NOT_FOUND "$domain">&2
     return 1
   fi
 }
