@@ -1,3 +1,5 @@
+MSG_FILE="$WINHOSTCTL_DIR/msg/messages.json"
+
 copy_and_clean_host_file() {
   local input="$1" output="$2"
 
@@ -13,7 +15,7 @@ copy_and_clean_host_file() {
 
 flushdnswin() {
   if ! powershell.exe -Command "ipconfig /flushdns" >/dev/null 2>&1; then
-    echo "❌ Failed to flush DNS cache. Try running as administrator." >&2
+    msg error FLUSH_DNS_FAILED >&2
     return 1
   fi
 }
@@ -23,13 +25,13 @@ is_valid_ip() {
   IFS='.' read -r o1 o2 o3 o4 extra <<< "$ip"
 
   if [[ -n "$extra" || -z "$o1" || -z "$o2" || -z "$o3" || -z "$o4" ]]; then
-    echo "❌ Invalid IP Address: '$1'" >&2
+    msg error INVALID_IP "$ip">&2
     return 1
   fi
 
   for octet in "$o1" "$o2" "$o3" "$o4"; do
     if ! [[ "$octet" =~ ^[0-9]+$ ]] || ((octet < 0 || octet > 254)); then
-      echo "❌ Invalid IP Address: '$1'" >&2
+      msg error INVALID_IP "$ip">&2
       return 1
     fi
   done
@@ -40,7 +42,7 @@ is_valid_domain() {
   if [[ $1 == *.* && $1 =~ ^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$ ]]; then
     return 0
   else
-    echo "❌ Invalid domain: $1"  >&2
+    msg error INVALID_DOMAIN "$domain" >&2
     return 1
   fi
 }
@@ -127,7 +129,7 @@ delete_host() {
   fi
 
   if [[ "$success" == false && "$in_section" == false ]]; then
-    echo "❌ Domain: '$domain' not found" >&2
+    msg error DOMAIN_NOT_FOUND "$domain">&2
     return 1
   fi
 }
@@ -144,6 +146,10 @@ addhost() {
       --domain|-d)
         shift
         domain="$1"
+        [[ -z "$1" ]] && {
+          msg error MISSING_ARGUMENT >&2
+          return 1
+        }
         ;;
       --ip|-i)
         shift
@@ -164,16 +170,16 @@ addhost() {
   insert_host "$domain" "$ip" "$clear_host_file" "$new_host_file"
 
   if ! sudo cp "$new_host_file" "$HOSTS_FILE"; then
-    echo "❌ Permission denied updating hosts file" >&2
+    msg error PERMISSION_DENIED >&2
     return 1
   fi
 
   flushdnswin
 
   if [[ "$ip" == "$DEFAULT_IP_ADDRESS" ]]; then
-    echo "✔️ Domain '$domain' added"
+    msg success HOST_ADDED_DEFAULT "$domain"
   else
-    echo "✔️ Domain '$domain' pointing to $ip added"
+    msg success HOST_ADDED_CUSTOM "$domain" "$ip"
   fi
 }
 
@@ -189,7 +195,7 @@ removehost() {
       --domain|-d)
         shift
         [[ -z "$1" ]] && {
-          echo "❌ Missing domain after --domain" >&2
+          msg error MISSING_ARGUMENT >&2
           return 1
         }
         domain="$1"
@@ -208,11 +214,24 @@ removehost() {
 
 
   if ! sudo cp "$new_host_file" "$HOSTS_FILE"; then
-    echo "❌ Permission denied updating hosts file. Try " >&2
+    msg error PERMISSION_DENIED >&2
     return 1
   fi
 
   flushdnswin
 
-  echo "✔️ Domain '$domain' removed"
+  msg success HOST_REMOVED "$domain"
+}
+
+msg() {
+  local level="$1"
+  local key="$2"
+  shift 2
+
+  _msg=$(jq -r ".\"${level}\"[\"${key}\"]" "$MSG_FILE")
+  if [[ "$_msg" == *"%s"* ]]; then
+    printf "$_msg\n" "$@"
+  else
+    echo -e "$_msg"
+  fi
 }

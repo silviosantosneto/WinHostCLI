@@ -23,29 +23,14 @@ case "$action" in
     domain="$1"
     removehost --domain "$domain"
     ;;
-  --help|-h)
-    echo "Windows Hosts Manager via WSL"
-    echo "Manage your Windows 'hosts' file easily from WSL."
-    echo
-    echo "Usage:"
-    echo "  winhost --add <domain> [ip]     Add a domain to the Windows hosts file."
-    echo "                                  If no IP is provided, defaults to \$DEFAULT_IP_ADDRESS."
-    echo
-    echo "  winhost --remove <domain>       Remove a domain from the Windows hosts file."
-    echo
-    echo "Options:"
-    echo "  -a, --add       Add a new host entry"
-    echo "  -r, --remove    Remove an existing host entry"
-    echo "  -h, --help      Show this help message"
-    echo
-    echo "Examples:"
-    echo "  winhost --add mysite.local              # Uses default IP"
-    echo "  winhost --add mysite.local 192.168.0.1  # Uses custom IP"
-    echo "  winhost --remove mysite.local"
+  --help)
+    msg help LONG
+    ;;
+  -h)
+    msg help SHORT
     ;;
   *)
-    echo "❌ Unknown action: $action"
-    echo "Use --help for usage." >&2
+    msg error UNKNOWN_ACTION >&2
     exit 1
     ;;
 esac
