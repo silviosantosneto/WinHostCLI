@@ -98,6 +98,6 @@ Got an idea? Found a bug?
 
 ---
 
-**MIT License** – Free to use, modify, and distribute. Just don’t blame me if your toaster tries to run this. 😉
+**MIT License** – Free to use, modify, and distribute. Just don’t blame me if your toaster tries to run this.
 
-Thanks for checking it out — and may your `hosts` file stay clean and your domains always resolve. 🙌
+Thanks for checking it out — and may your `hosts` file stay clean and your domains always resolve.
