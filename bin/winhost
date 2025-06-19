@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WINHOSTCTL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 source "$WINHOSTCTL_DIR/.env"
-source "$WINHOSTCTL_DIR/lib/functions.sh"
+source "$WINHOSTCTL_DIR/lib/functions"
 
 action="$1"
 shift

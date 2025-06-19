@@ -1,88 +1,71 @@
 <p align="center">
-  <img src="https://lh3.googleusercontent.com/d/1LKv9ZI8SF0bHln5M_AxhJxYUYcY01PBN" alt="Logo" width="300"/>
-</p>
+  <img src="https://lh3.googleusercontent.com/d/17pK2krk6QIRGQTEQHd9sSnuB2EygfOrZ" alt="Logo" width="300"/>
 <p align="center">
-  <a href="https://github.com/silviosantosneto/winhostctl/releases">
-    <img src="https://img.shields.io/github/v/release/silviosantosneto/winhostctl" alt="Version">
+  <a href="https://github.com/silviosantosneto/winhostcli/releases">
+    <img alt="Version" src="https://img.shields.io/github/v/release/silviosantosneto/winhostcli" >
   </a>
-  <a href="https://github.com/silviosantosneto/winhostctl/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/silviosantosneto/winhostctl" alt="License">
-
+  <a href="https://github.com/silviosantosneto/winhostcli/blob/main/LICENSE">
+    <img alt="GitHub License" src="https://img.shields.io/github/license/silviosantosneto/winhostcli">
   </a>
   <a href="https://www.gnu.org/software/bash/">
     <img src="https://img.shields.io/badge/Shell-bash-informational" alt="Shell">
   </a>
 </p>
 
+---
 
-Hi! 👋  
-I built winhostctl because I really don’t like using localhost as a domain when working with Valet on WSL. I wanted to use custom domains like myproject.test, but doing that on Ubuntu inside WSL meant editing the Windows hosts file manually — and that gets old fast.
+## Why winhostcli?
 
-So, I wrote a script that handles it for me. Clean, safe, and zero hassle.If you're also tired of jumping through hoops just to map a local domain, this tool might save you a few headaches.
+I built **winhostcli** because I got tired of editing the Windows `hosts` file every time I needed a custom domain like `myproject.test` while working inside WSL. Using `localhost` just didn't cut it for local development.
 
+This tool saves time, prevents mistakes, and keeps your system clean. If you're using Laravel Valet on WSL or just want an easier way to manage your dev domains, this might be exactly what you need.
 
-## 🚀 Version 1.0.0
+## What it does
 
-After a few iterations and a lot of terminal testing, I'm happy to finally release **v1.0.0**:  
-👉 https://github.com/silviosantosneto/winhostctl/releases/tag/v1.0.0
-
-It's stable, predictable, and (I think) does one thing really well.
-
-## ✅ What it actually does
-
-- Adds domains to the `hosts` file using a *dedicated section* it can safely manage.
+- Adds domains to the `hosts` file using a *dedicated and safe section*.
 - Removes entries it previously added.
-- Defaults to `127.0.0.1`, but you can configure the IP via `.env`.
-- Doesn’t touch anything outside its section, ever.
-- Works great with Laravel Valet on WSL (which is part of why I built it).
-- Plays nice with aliases and is safe to script around.
+- Defaults to `127.0.0.1`, but supports custom IPs via `.env`.
+- Never touches lines outside its block.
+- Plays nice with aliases and scripts.
+- Designed to integrate smoothly with Laravel Valet on WSL.
 
-You end up with a section like this:
-
-```
-# =========== Start winhostctl generated Hosts. Do not change. ============
+### Example output
+```bash
+# Block added to hosts:
+# =========== Start winhostcli generated Hosts. Do not change. ============
 127.0.0.1               myproject.test
-# ================== End winhostctl end generated Hosts. ==================
+# ================== End winhostcli end generated Hosts. ==================
 ```
 
-## 🧩 How to install (the quick version)
+## Quick installation
 
 ```bash
-git clone https://github.com/silviosantosneto/winhostctl.git
-chmod +x winhostctl/bin/winhost
-echo 'export PATH="$PATH:/path/to/winhostctl/bin"' >> ~/.bashrc # or .zshrc
+git clone https://github.com/silviosantosneto/winhostcli.git
+chmod +x winhostcli/bin/winhost
+echo 'export PATH="$PATH:/path/to/winhostcli/bin"' >> ~/.bashrc # or .zshrc
 source ~/.bashrc # or .zshrc
 ```
 
-## ⚙️ How I use it
+## Usage
 
 ```bash
 # --------------------------- Help ----------------------------
-# See the built-in help
 winhost -h
-# See the long help
 winhost --help
 
 # ------------------------ Add a domain ------------------------
-# Add a domain
 winhost -a myproject.test
-# Using the long form
 winhost --add myproject.test
 
-# --------------- Add a domain with a custom IP ----------------
-winhost -a myproject.test 192.168.0.1
-# Using the long form
+# ---- Add a domain with a custom IP (from .env or manually) ----
 winhost --add myproject.test 192.168.0.1
 
 # ----------------------- Remove a domain -----------------------
-# Remove a domain
 winhost -r myproject.test
-# Using the long form
 winhost --remove myproject.test
 ```
 
-## 💡 Example
-
+### Sample session
 ```bash
 $ winhost --add myproject.test
 ✔️ Domain myproject.test added
@@ -94,30 +77,27 @@ $ winhost --remove myproject.test
 ✔️ Domain myproject.test removed
 ```
 
-> ⚠️ I made it so the script only touches the block it owns. Your other `hosts` entries are safe.
+> winhostcli only touches what it creates. Your custom `hosts` entries are safe.
 
-## 🎯 Why I built this
+## Under the hood
 
-Honestly? I just didn’t want to install another tool or mess with PowerShell or Admin permissions every time I wanted to test a `.test` domain.  
-This script works from WSL and handles the `hosts` file with care. It’s tiny, fast, and you can tweak it if you want.
+- Core logic lives in `lib/functions`, modular and clean.
+- Uses a `.env` file to set the default IP.
+- Manipulates `hosts` using temporary files for safety.
+- Bash and zsh compatible.
+- Inspired by Laravel Valet & Homestead, but works independently.
 
-## 🛠 Under the hood
+## Contributing
 
-- The logic lives in `lib/functions`, separate from the CLI wrapper.
-- The IP is configurable in '.env' (defaults to `127.0.0.1`).
-- It uses temp files for safety.
-- Compatible with bash and zsh.
-- Inspired by Laravel Valet and Homestead, but not tied to them.
+Got an idea? Found a bug?
 
-## 🤝 Want to help?
-
-1. Open an issue or idea first.
-2. Fork the repo and create a feature branch.
-3. Send a PR to `develop`.
-4. If it’s solid, I’ll merge it into the next version.
+1. Open an issue or discussion first.
+2. Fork the project and create a feature branch.
+3. Submit a pull request to `develop`.
+4. If it's solid, it'll be reviewed and merged into the next release.
 
 ---
-**MIT License** – feel free to use, clone, and remix — just don’t blame me if Windows claps back with a blue screen and your fan starts screaming.
-Works fine here… so far. 🤞
 
-Thanks for stopping by — may your hosts stay clean and your terminals crash-free! 🙌
+**MIT License** – Free to use, modify, and distribute. Just don’t blame me if your toaster tries to run this. 😉
+
+Thanks for checking it out — and may your `hosts` file stay clean and your domains always resolve. 🙌
