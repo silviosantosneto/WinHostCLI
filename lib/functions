@@ -271,8 +271,16 @@ get_ip() {
 }
 
 listhosts() {
-  local section="$1" line
+  local line ip domain comment
   local in_section=false
+  local format="| %-25s | %-15s | %-40s |\n"
+
+  # Cabeçalho
+  printf "\n"
+  printf " ----------------------------------------------------------------------------------------\n"
+
+  printf "$format" "DOMAIN" "IP" "NOTES"
+  printf "|---------------------------+-----------------+------------------------------------------|\n"
 
   while IFS= read -r line || [[ -n "$line" ]]; do
     if [[ "$line" == "# $SECTION_START" ]]; then
@@ -287,8 +295,17 @@ listhosts() {
       fi
 
       if [[ "$line" != \#* && -n "$line" ]]; then
-        echo "$line"
+        # Extrair IP e domínio (primeiros dois campos)
+        ip=$(echo "$line" | awk '{print $1}')
+        domain=$(echo "$line" | awk '{print $2}')
+        comment=$(echo "$line" | sed -n 's/.*#\s*\(.*\)/\1/p')
+
+        printf "$format" "$domain" "$ip" "$comment"
       fi
     fi
-  done <"$HOSTS_FILE"
+  done < "$HOSTS_FILE"
+
+  printf " ----------------------------------------------------------------------------------------\n"
+  printf "\n"
 }
+
