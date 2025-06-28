@@ -248,7 +248,6 @@ get_comment() {
   for arg in "$1" "$2"; do
     [[ -z "$arg" ]] && continue
 
-    # Se o argumento contém qualquer caractere diferente de número ou ponto, é um comentário
     if ! echo "$arg" | grep -qE '^([0-9]+\.){0,3}[0-9]+$'; then
       echo "$arg"
       return
@@ -261,7 +260,6 @@ get_ip() {
   for arg in "$@"; do
     [[ -z "$arg" ]] && continue
 
-    # Remove números e pontos. Se o restante for vazio, é um IP-like
     if [[ -z "$(echo "$arg" | tr -d '0-9.')" ]]; then
       echo "$arg"
       return
@@ -273,14 +271,13 @@ get_ip() {
 listhosts() {
   local line ip domain comment
   local in_section=false
-  local format="| %-25s | %-15s | %-40s |\n"
+  local format="| %-23s | %-15s | %-27s |\n"
 
-  # Cabeçalho
   printf "\n"
-  printf " ----------------------------------------------------------------------------------------\n"
+  printf "+-------------------------------------------------------------------------+\n"
 
   printf "$format" "DOMAIN" "IP" "NOTES"
-  printf "|---------------------------+-----------------+------------------------------------------|\n"
+  printf "+-------------------------+-----------------+-----------------------------+\n"
 
   while IFS= read -r line || [[ -n "$line" ]]; do
     if [[ "$line" == "# $SECTION_START" ]]; then
@@ -295,7 +292,6 @@ listhosts() {
       fi
 
       if [[ "$line" != \#* && -n "$line" ]]; then
-        # Extrair IP e domínio (primeiros dois campos)
         ip=$(echo "$line" | awk '{print $1}')
         domain=$(echo "$line" | awk '{print $2}')
         comment=$(echo "$line" | sed -n 's/.*#\s*\(.*\)/\1/p')
@@ -305,7 +301,8 @@ listhosts() {
     fi
   done < "$HOSTS_FILE"
 
-  printf " ----------------------------------------------------------------------------------------\n"
+  printf "+-------------------------------------------------------------------------+\n"
   printf "\n"
+  printf
 }
 
