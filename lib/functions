@@ -242,3 +242,30 @@ msg() {
     echo -e "$_msg"
   fi
 }
+
+get_comment() {
+  local arg
+  for arg in "$1" "$2"; do
+    [[ -z "$arg" ]] && continue
+
+    # Se o argumento contém qualquer caractere diferente de número ou ponto, é um comentário
+    if ! echo "$arg" | grep -qE '^([0-9]+\.){0,3}[0-9]+$'; then
+      echo "$arg"
+      return
+    fi
+
+  done
+}
+
+get_ip() {
+  for arg in "$@"; do
+    [[ -z "$arg" ]] && continue
+
+    # Remove números e pontos. Se o restante for vazio, é um IP-like
+    if [[ -z "$(echo "$arg" | tr -d '0-9.')" ]]; then
+      echo "$arg"
+      return
+    fi
+  done
+  echo "$DEFAULT_IP_ADDRESS"
+}

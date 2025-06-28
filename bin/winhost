@@ -13,40 +13,28 @@ action="$1"
 shift
 
 case "$action" in
---add|-a)
+--add | -a)
   domain="$1"
   shift
 
-  comment=""
-  ip=""
-
-  for arg in "$1" "$2"; do
-    [[ -z "$arg" ]] && continue
-
-    if [[ -z "$(echo "$arg" | tr -d '0-9.')" ]]; then
-      ip="$arg"
-    else
-      comment="$arg"
-    fi
-  done
-
-  ip="${ip:-$DEFAULT_IP_ADDRESS}"
+  comment=$(get_comment "$@")
+  ip=$(get_ip "$@")
 
   addhost --domain "$domain" --ip "$ip" --comment "$comment"
   ;;
 
-  --remove|-r)
-    domain="$1"
-    removehost --domain "$domain"
-    ;;
-  --help)
-    msg help LONG
-    ;;
-  -h)
-    msg help SHORT
-    ;;
-  *)
-    msg error UNKNOWN_ACTION >&2
-    exit 1
-    ;;
+--remove | -r)
+  domain="$1"
+  removehost --domain "$domain"
+  ;;
+--help)
+  msg help LONG
+  ;;
+-h)
+  msg help SHORT
+  ;;
+*)
+  msg error UNKNOWN_ACTION >&2
+  exit 1
+  ;;
 esac
