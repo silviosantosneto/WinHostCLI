@@ -1,6 +1,6 @@
 #!/bin/bash
 # ================================================================================================
-# winhost - Windows Hosts Manager via WSL
+# winhost - Windows Hosts Manager
 # ================================================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -13,24 +13,28 @@ action="$1"
 shift
 
 case "$action" in
-  --add|-a)
-    domain="$1"
-    shift
-    ip="${1:-$DEFAULT_IP_ADDRESS}"
-    addhost --domain "$domain" --ip "$ip"
-    ;;
-  --remove|-r)
-    domain="$1"
-    removehost --domain "$domain"
-    ;;
-  --help)
-    msg help LONG
-    ;;
-  -h)
-    msg help SHORT
-    ;;
-  *)
-    msg error UNKNOWN_ACTION >&2
-    exit 1
-    ;;
+--add | -a)
+  domain="$1"
+  shift
+
+  comment=$(get_comment "$@")
+  ip=$(get_ip "$@")
+
+  addhost --domain "$domain" --ip "$ip" --comment "$comment"
+  ;;
+
+--remove | -r)
+  domain="$1"
+  removehost --domain "$domain"
+  ;;
+--help)
+  msg help LONG
+  ;;
+-h)
+  msg help SHORT
+  ;;
+*)
+  msg error UNKNOWN_ACTION >&2
+  exit 1
+  ;;
 esac
