@@ -269,3 +269,26 @@ get_ip() {
   done
   echo "$DEFAULT_IP_ADDRESS"
 }
+
+listhosts() {
+  local section="$1" line
+  local in_section=false
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" == "# $SECTION_START" ]]; then
+      in_section=true
+      continue
+    fi
+
+    if [[ "$in_section" == true ]]; then
+      if [[ "$line" == "# $SECTION_END" ]]; then
+        in_section=false
+        continue
+      fi
+
+      if [[ "$line" != \#* && -n "$line" ]]; then
+        echo "$line"
+      fi
+    fi
+  done <"$HOSTS_FILE"
+}
