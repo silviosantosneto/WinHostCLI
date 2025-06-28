@@ -48,10 +48,14 @@ is_valid_domain() {
 }
 
 insert_host() {
-  local domain="$1" ip="$2" infile="$3" outfile="$4"
-  local in_section=false success=false line host_line
+local domain="$1" ip="$2" comment="$3" infile="$4" outfile="$5"
+local in_section=false success=false line host_line
 
-  host_line="$(printf "%s\t\t%s" "$ip" "$domain")"
+  if [[ -n "$comment" ]]; then
+    host_line="$(printf "%s\t\t%s\t\t#%s" "$ip" "$domain" "$comment")"
+  else
+    host_line="$(printf "%s\t\t%s" "$ip" "$domain")"
+  fi
 
   while IFS= read -r line || [[ -n "$line" ]]; do
     if [[ "$line" == "# $SECTION_START" ]]; then
@@ -143,7 +147,7 @@ addhost() {
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --domain|-d)
+      --domain)
         shift
         domain="$1"
         [[ -z "$1" ]] && {
@@ -151,9 +155,13 @@ addhost() {
           return 1
         }
         ;;
-      --ip|-i)
+      --ip)
         shift
         ip="$1"
+        ;;
+      --comment)
+        shift
+        comment="$1"
         ;;
     esac
     shift
@@ -167,7 +175,7 @@ addhost() {
     return 1
   fi
 
-  insert_host "$domain" "$ip" "$clear_host_file" "$new_host_file"
+  insert_host "$domain" "$ip" "$comment" "$clear_host_file" "$new_host_file"
 
   if ! sudo cp "$new_host_file" "$HOSTS_FILE"; then
     msg error PERMISSION_DENIED >&2

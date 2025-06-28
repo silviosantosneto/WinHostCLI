@@ -13,12 +13,29 @@ action="$1"
 shift
 
 case "$action" in
-  --add|-a)
-    domain="$1"
-    shift
-    ip="${1:-$DEFAULT_IP_ADDRESS}"
-    addhost --domain "$domain" --ip "$ip"
-    ;;
+--add|-a)
+  domain="$1"
+  shift
+
+  comment=""
+  ip=""
+
+  for arg in "$1" "$2"; do
+    [[ -z "$arg" ]] && continue
+
+    # Se ao remover números e pontos sobrar algo, é comentário
+    if [[ -z "$(echo "$arg" | tr -d '0-9.')" ]]; then
+      ip="$arg"
+    else
+      comment="$arg"
+    fi
+  done
+
+  ip="${ip:-$DEFAULT_IP_ADDRESS}"
+
+  addhost --domain "$domain" --ip "$ip" --comment "$comment"
+  ;;
+
   --remove|-r)
     domain="$1"
     removehost --domain "$domain"
