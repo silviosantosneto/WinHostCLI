@@ -17,15 +17,17 @@ case "$action" in
   domain="$1"
   shift
 
-  comment=$(get_comment "$@")
   ip=$(get_ip "$@")
+  comment=$(get_comment "$@")
 
   addhost --domain "$domain" --ip "$ip" --comment "$comment"
   ;;
-
 --remove | -r)
   domain="$1"
   removehost --domain "$domain"
+  ;;
+--list | -l)
+  listhosts
   ;;
 --help)
   msg help LONG
