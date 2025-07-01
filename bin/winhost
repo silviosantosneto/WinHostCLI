@@ -13,7 +13,8 @@ action="$1"
 shift
 
 if [[ -z "$action" ]]; then
-  msg help SHORT
+  msg error NO_ACTION
+  msg help ACTION
   exit 0
 fi
 
@@ -41,7 +42,8 @@ case "$action" in
   msg help SHORT
   ;;
 *)
-  msg error UNKNOWN_ACTION >&2
+  msg error UNKNOWN_ACTION
+  msg help ACTION
   exit 1
   ;;
 esac
