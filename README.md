@@ -1,17 +1,4 @@
 # WinHostCLI
-<a href="https://github.com/silviosantosneto/winhostcli/releases">
-    <img alt="Version" src="https://img.shields.io/github/v/release/silviosantosneto/winhostcli" >
-  </a>
-<a href="https://github.com/silviosantosneto/winhostcli/blob/main/LICENSE">
-    <img alt="GitHub License" src="https://img.shields.io/github/license/silviosantosneto/winhostcli">
-  </a>
-  <a href="https://www.gnu.org/software/bash/">
-    <img src="https://img.shields.io/badge/shell-bash-informational" alt="Shell">
-  </a>
-
-----
-
-## Overview
 
 **WinHostCLI** is a command-line tool designed to simplify the management of domain entries in the Windows `hosts`
 file — specifically for developers working within a WSL2 (Windows Subsystem for Linux) environment.
@@ -83,7 +70,3 @@ Got an idea? Found a bug?
 2. Fork the project and create a feature branch.
 3. Submit a pull request to `develop`.
 4. If it's solid, it'll be reviewed and merged into the next release.
-
----
-
-**MIT License** – Free to use, modify, and distribute.
