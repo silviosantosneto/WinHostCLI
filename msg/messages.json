@@ -1,20 +1,22 @@
 {
     "error" :{
-      "UNKNOWN_ACTION": "❌ Unknown action: %s\nUse -h or --help for usage.",
-      "MISSING_ARGUMENT":"❌ Missing domain after --add",
-      "INVALID_IP": "❌ Invalid IP Address: '%s'",
-      "INVALID_DOMAIN": "❌ Invalid domain: %s",
-      "DOMAIN_NOT_FOUND": "❌ Domain: '%s' not found",
-      "PERMISSION_DENIED": "❌ Permission denied updating hosts file",
-      "FLUSH_DNS_FAILED": "❌ Failed to flush DNS cache. Try running as administrator."
+      "UNKNOWN_ACTION": "❌ Unknown action.",
+      "NO_ACTION": "❌ No action specified.",
+      "MISSING_ARGUMENT":"❌ Missing domain.",
+      "INVALID_IP": "❌ Invalid IP Address: '%s'.",
+      "INVALID_DOMAIN": "❌ Invalid domain: '%s'.",
+      "DOMAIN_NOT_FOUND": "❌ Domain: '%s' not found.",
+      "PERMISSION_DENIED": "❌ Permission denied updating hosts file. Try running with -sudo.",
+      "FLUSH_DNS_FAILED": "❌ Failed to flush DNS cache. Try running with -sudo."
     },
     "success": {
-      "HOST_ADDED_DEFAULT" : "✔️ Domain '%s' added",
-      "HOST_ADDED_CUSTOM": "✔️ Domain '%s' pointing to %s added",
-      "HOST_REMOVED": "✔️ Domain '%s' removed"
+      "HOST_ADDED_DEFAULT" : "✔️ Domain '%s' added.",
+      "HOST_ADDED_CUSTOM": "✔️ Domain '%s' pointing to %s added.",
+      "HOST_REMOVED": "✔️ Domain '%s' removed."
     },
     "help": {
-      "LONG": "\nWindows Hosts Manager via WSL\nManage your Windows 'hosts' file from WSL.\n\nUsage:\n  winhost --add <domain> [ip]     Add a domain to the Windows hosts file.\n                                  If no IP is provided, defaults to your configured default IP.\n\n  winhost --remove <domain>       Remove a domain from the Windows hosts file.\n\nOptions:\n  -a, --add       Add a new host entry\n  -r, --remove    Remove an existing host entry\n  -h, --help      Show help message\n\nExamples:\n  winhost --add domain.test               # Uses default IP\n  winhost --add domain.test 192.168.0.1   # Uses custom IP\n  winhost --remove domain.test\n ",
-      "SHORT": "\nUsage: winhost [options] <domain> [ip]\nOptions: -a (add), -r (remove), -h (help)\nExample: winhost -a domain.test\n         winhost -r domain.test\n         winhost -h\n\nFor more details, use --help\n "
+      "LONG": "\nWindows Hosts Manager\nManage your Windows 'hosts' file from WSL in a safe, scriptable way.\n\nUsage:\n  winhost [options] <domain> [ip] [\"note\"]\n\nOptions:\n  -a, --add       Add a new host entry (supports custom IP and inline comment)\n  -r, --remove    Remove an existing host entry\n  -l, --list      List all managed host entries\n  -h, --help      Show this help message\n\nExamples:\n  winhost --add myproject.domain                        # Adds with default IP\n  winhost --add myproject.domain \"My local project\"     # Adds with comment\n  winhost --add myproject.domain 192.168.0.1            # Adds with custom IP\n  winhost --add myproject.domain \"Staging\" 192.168.0.5  # Adds with comment and IP\n  winhost --remove myproject.domain                     # Removes entry\n  winhost --list                                        # Lists all entries\n ",
+      "SHORT": "\nUsage: winhost [options] <domain> [ip]\nOptions: -a (add), -r (remove), -h (help), -l (list) \nExample: winhost -a myproject.domain\n         winhost -r myproject.domain\n         winhost -l\n         winhost -h\n\nFor more details, use --help\n ",
+      "ACTION": "\nUse:\n  winhost --help      Show full usage\n  winhost --add       Add a domain\n  winhost --remove    Remove a domain\n  winhost --list      List managed domains\n "
     }
 }
