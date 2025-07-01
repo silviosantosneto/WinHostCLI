@@ -12,6 +12,11 @@ source "$WINHOSTCTL_DIR/lib/functions"
 action="$1"
 shift
 
+if [[ -z "$action" ]]; then
+  msg help SHORT
+  exit 0
+fi
+
 case "$action" in
 --add | -a)
   domain="$1"
