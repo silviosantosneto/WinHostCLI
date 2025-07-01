@@ -21,17 +21,16 @@ flushdnswin() {
 }
 
 is_valid_ip() {
-  local ip="$1"
-  IFS='.' read -r o1 o2 o3 o4 extra <<< "$ip"
+  IFS='.' read -r o1 o2 o3 o4 extra <<<"$1"
 
   if [[ -n "$extra" || -z "$o1" || -z "$o2" || -z "$o3" || -z "$o4" ]]; then
-    msg error INVALID_IP "$ip">&2
+    msg error INVALID_IP "$1" >&2
     return 1
   fi
 
   for octet in "$o1" "$o2" "$o3" "$o4"; do
     if ! [[ "$octet" =~ ^[0-9]+$ ]] || ((octet < 0 || octet > 254)); then
-      msg error INVALID_IP "$ip">&2
+      msg error INVALID_IP "$1" >&2
       return 1
     fi
   done
@@ -42,25 +41,25 @@ is_valid_domain() {
   if [[ $1 == *.* && $1 =~ ^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$ ]]; then
     return 0
   else
-    msg error INVALID_DOMAIN "$domain" >&2
+    msg error INVALID_DOMAIN "$1" >&2
     return 1
   fi
 }
 
 insert_host() {
-local domain="$1" ip="$2" comment="$3" infile="$4" outfile="$5"
-local in_section=false success=false line host_line
+  local domain="$1" ip="$2" comment="$3" infile="$4" outfile="$5"
+  local in_section=false success=false line host_line
 
   if [[ -n "$comment" ]]; then
-    host_line="$(printf "%s\t\t%s\t\t#%s" "$ip" "$domain" "$comment")"
+    host_line="$(printf "%s\t\t%s\t\t#%s " "$ip" "$domain" "$comment")"
   else
     host_line="$(printf "%s\t\t%s" "$ip" "$domain")"
   fi
 
   while IFS= read -r line || [[ -n "$line" ]]; do
     if [[ "$line" == "# $SECTION_START" ]]; then
-      printf '%s\n' "$line" >> "$outfile" &&  in_section=true
-      printf '%s\n' "$host_line" >> "$outfile" && success=true
+      printf '%s\n' "$line" >>"$outfile" && in_section=true
+      printf '%s\n' "$host_line" >>"$outfile" && success=true
       continue
     fi
 
@@ -78,11 +77,11 @@ local in_section=false success=false line host_line
       fi
     fi
 
-    printf '%s\n' "$line" >> "$outfile"
-  done < "$infile"
+    printf '%s\n' "$line" >>"$outfile"
+  done <"$infile"
 
   if [[ "$success" == false && "$in_section" == false ]]; then
-    printf '%s\n%s\n%s\n' "# $SECTION_START" "$host_line" "# $SECTION_END" >> "$outfile"
+    printf '%s\n%s\n%s\n' "# $SECTION_START" "$host_line" "# $SECTION_END" >>"$outfile"
   fi
 }
 
@@ -92,7 +91,7 @@ delete_host() {
 
   while IFS= read -r line || [[ -n "$line" ]]; do
     if [[ "$line" == "# $SECTION_START" ]]; then
-      printf '%s\n' "$line" >> "$outfile" &&  in_section=true
+      printf '%s\n' "$line" >>"$outfile" && in_section=true
       continue
     fi
 
@@ -100,7 +99,7 @@ delete_host() {
       if [[ "$line" == "# $SECTION_END" ]]; then
         in_section=false
       elif [[ "$success" == true && "$line" =~ ^[[:space:]]*$ ]]; then
-        printf '%s\n' "# $SECTION_END" >> "$outfile"
+        printf '%s\n' "# $SECTION_END" >>"$outfile"
         in_section=false
         continue
       elif [[ "$line" != \#* && "$line" =~ (^|[[:space:]])$domain($|[[:space:]#]) ]]; then
@@ -109,8 +108,8 @@ delete_host() {
       fi
     fi
 
-    printf '%s\n' "$line" >> "$outfile"
-  done < "$infile"
+    printf '%s\n' "$line" >>"$outfile"
+  done <"$infile"
 
   if grep -q "# $SECTION_START" "$outfile"; then
     tmpfile=$(mktemp)
@@ -128,12 +127,12 @@ delete_host() {
           print $0
         }
       }
-    ' "$outfile" > "$tmpfile"
+    ' "$outfile" >"$tmpfile"
     mv "$tmpfile" "$outfile"
   fi
 
   if [[ "$success" == false && "$in_section" == false ]]; then
-    msg error DOMAIN_NOT_FOUND "$domain">&2
+    msg error DOMAIN_NOT_FOUND "$domain" >&2
     return 1
   fi
 }
@@ -147,22 +146,22 @@ addhost() {
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --domain)
-        shift
-        domain="$1"
-        [[ -z "$1" ]] && {
-          msg error MISSING_ARGUMENT >&2
-          return 1
-        }
-        ;;
-      --ip)
-        shift
-        ip="$1"
-        ;;
-      --comment)
-        shift
-        comment="$1"
-        ;;
+    --domain)
+      shift
+      domain="$1"
+      [[ -z "$1" ]] && {
+        msg error MISSING_ARGUMENT >&2
+        return 1
+      }
+      ;;
+    --ip)
+      shift
+      ip="$1"
+      ;;
+    --comment)
+      shift
+      comment="$1"
+      ;;
     esac
     shift
   done
@@ -200,14 +199,14 @@ removehost() {
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --domain|-d)
-        shift
-        [[ -z "$1" ]] && {
-          msg error MISSING_ARGUMENT >&2
-          return 1
-        }
-        domain="$1"
-        ;;
+    --domain | -d)
+      shift
+      [[ -z "$1" ]] && {
+        msg error MISSING_ARGUMENT >&2
+        return 1
+      }
+      domain="$1"
+      ;;
     esac
     shift
   done
@@ -219,7 +218,6 @@ removehost() {
   if ! delete_host "$domain" "$clear_host_file" "$new_host_file"; then
     return 1
   fi
-
 
   if ! sudo cp "$new_host_file" "$HOSTS_FILE"; then
     msg error PERMISSION_DENIED >&2
@@ -243,3 +241,66 @@ msg() {
     echo -e "$_msg"
   fi
 }
+
+get_comment() {
+  local arg
+  for arg in "$1" "$2"; do
+    [[ -z "$arg" ]] && continue
+
+    if ! echo "$arg" | grep -qE '^([0-9]+\.){0,3}[0-9]+$'; then
+      echo "$arg"
+      return
+    fi
+
+  done
+}
+
+get_ip() {
+  for arg in "$@"; do
+    [[ -z "$arg" ]] && continue
+
+    if [[ -z "$(echo "$arg" | tr -d '0-9.')" ]]; then
+      echo "$arg"
+      return
+    fi
+  done
+  echo "$DEFAULT_IP_ADDRESS"
+}
+
+listhosts() {
+  local line ip domain comment
+  local in_section=false
+  local format="| %-23s | %-15s | %-27s |\n"
+
+  printf "\n"
+  printf "+-------------------------------------------------------------------------+\n"
+
+  printf "$format" "DOMAIN" "IP" "NOTES"
+  printf "+-------------------------+-----------------+-----------------------------+\n"
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" == "# $SECTION_START" ]]; then
+      in_section=true
+      continue
+    fi
+
+    if [[ "$in_section" == true ]]; then
+      if [[ "$line" == "# $SECTION_END" ]]; then
+        in_section=false
+        continue
+      fi
+
+      if [[ "$line" != \#* && -n "$line" ]]; then
+        ip=$(echo "$line" | awk '{print $1}')
+        domain=$(echo "$line" | awk '{print $2}')
+        comment=$(echo "$line" | sed -n 's/.*#\s*\(.*\)/\1/p')
+
+        printf "$format" "$domain" "$ip" "$comment"
+      fi
+    fi
+  done < "$HOSTS_FILE"
+
+  printf "+-------------------------------------------------------------------------+\n"
+  printf "\n"
+}
+

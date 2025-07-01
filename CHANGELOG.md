@@ -2,22 +2,39 @@
 
 ---
 
+## [1.1.0] - 2025-06-28
+
+### Added
+
+- Support for inline comments in `--add`.
+- `--list` command to display all managed domains in a formatted table.
+- Output for table headers using ANSI codes.
+
+### Changed
+
+- Refactored argument parsing using `get_ip` and `get_comment`
+- Improved formatting and help message output
+
+### Removed
+
+- none
+
+---
+
 ## [1.0.1] - 2025-06-19
 
 ### Added
 
-- `msg()` function to standardize error and info message output using `msg/messages.json`.
-- New error message key `MISSING_ARGUMENT` in `msg/messages.json`, used when the domain is missing in `--add`.
-- Argument validation logic inside `addhost()` to ensure domain is provided before proceeding.
+- `msg()` message system and `msg/messages.json`
+- Domain validation with specific error message
 
 ### Changed
 
-- Replaced hardcoded error messages with dynamic calls to `msg()`.
-- Improved CLI user feedback by making error messages more accurate and contextual.
+- Replaced static messages with `msg()` calls
 
 ### Removed
 
-- Outdated or hardcoded error strings related to domain input.
+- Hardcoded error strings
 
 ---
 
@@ -25,14 +42,15 @@
 
 ### Added
 
-- Initial stable release of `winhostcli`.
-- `add` command: add domain entries to the managed section of the Windows `hosts` file.
-- `remove` command: remove domain entries from the managed section.
-- Environment support via `.env`, including `DEFAULT_IP` fallback.
-- Safe file editing using temp files and validation before overwriting `hosts`.
-- Modular structure: `bin/winhost` (CLI) and `lib/functions` (core logic).
-- Output formatting and log messages with emojis for clarity.
-- Fully working on WSL, with support for Laravel-Valet like workflows.
+- Initial stable release of winhostcli.
+- `--add` command: add domain entries to a safe, dedicated section in the Windows `hosts` file.
+- `--remove` command: remove domains previously added by the CLI.
+- Support for `.env` file with configurable `DEFAULT_IP_ADDRESS`.
+- Safe file operations using temporary files to prevent data loss.
+- Modular architecture with a split between CLI entry (`bin/winhost`) and core logic (`lib/functions`).
+- User-friendly CLI output with emojis for clarity and better UX.
+- Compatibility with WSL and Laravel Valet development environments.
+- Designed to only manage entries inside its own section — never touches unrelated lines.
 
 ### Changed
 
